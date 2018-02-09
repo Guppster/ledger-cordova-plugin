@@ -3,9 +3,11 @@ package me.gurpreetsingh.ledger;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
+import com.btchip.*;
+import com.btchip.comm.BTChipTransport;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * This class handles the native Android operations of interacting with a Ledger device
@@ -50,6 +52,7 @@ public class ledger extends CordovaPlugin {
     //TODO: Link initialization steps because state needs to be maintained within Java (i think)
     private void initTransport(JSONArray args, CallbackContext callbackContext)
     {
+
         //Success can take a JSONObject, JSONArray, or String
         //Obviously can't send back a Transport object b/c it's going to JS
         callbackContext.success("Transport initialized");
@@ -60,6 +63,26 @@ public class ledger extends CordovaPlugin {
     //TODO: Link initialization steps because state needs to be maintained within Java (i think)
     private void initDongle(JSONArray args, CallbackContext callbackContext)
     {
+        BTChipDongle dongle = new BTChipDongle(new BTChipTransport()
+        {
+            @Override
+            public byte[] exchange(byte[] command) throws BTChipException
+            {
+                return new byte[0];
+            }
+
+            @Override
+            public void close() throws BTChipException
+            {
+
+            }
+
+            @Override
+            public void setDebug(boolean debugFlag)
+            {
+
+            }
+        });
     }
 
     //Allows the creation of a new wallet

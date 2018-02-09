@@ -1,0 +1,25 @@
+{
+  "name": "ledger-cordova-plugin",
+  "version": "1.0.0",
+  "description": "Cordova plugin for accessing ledger nano hardware wallet from iOS and Android devices",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Guppster/ledger-cordova-plugin.git"
+  },
+  "keywords": [
+    "ledger",
+    "cordova",
+    "android",
+    "ios"
+  ],
+  "author": "Gurpreet Singh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Guppster/ledger-cordova-plugin/issues"
+  },
+  "homepage": "https://github.com/Guppster/ledger-cordova-plugin#readme"
+}

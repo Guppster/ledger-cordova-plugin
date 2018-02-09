@@ -8,10 +8,12 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="ledger">
-                <param name="android-package" value="me.gurpreetsingh.ledger.ledger" />
+                <param name="android-package" value="android.ledger.ledger" />
             </feature>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml" />
         <source-file src="src/android/ledger.java" target-dir="src/me/gurpreetsingh/ledger/ledger" />
+
+        <framework src="src/android/android.gradle" custom="true" type="gradleReference" />
     </platform>
 </plugin>
