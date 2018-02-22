@@ -17,18 +17,5 @@
 ********************************************************************************
 */
 
-package com.btchip.comm;
-
-import com.btchip.BTChipException;
-
-import java.util.concurrent.Future;
-
-public interface BTChipTransport {
-
-   public Future<byte[]> exchange(byte[] command) throws BTChipException;
-
-   public void close() throws BTChipException;
-
-   public void setDebug(boolean debugFlag);
-
-}
+package com.ledger.wallet.service;
+parcelable ServiceResult;

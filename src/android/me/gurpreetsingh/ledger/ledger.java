@@ -1,11 +1,8 @@
 package me.gurpreetsingh.ledger;
 
-import org.apache.cordova.CordovaPlugin;
+import com.btchip.comm.android.BTChipTransportAndroid;
 import org.apache.cordova.CallbackContext;
-
-import com.btchip.*;
-import com.btchip.comm.BTChipTransport;
-
+import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -13,7 +10,9 @@ import org.json.JSONException;
  * This class handles the native Android operations of interacting with a Ledger device
  * It provides an API for JS to call native methods using the execute method as a link
  */
-public class ledger extends CordovaPlugin {
+public class ledger extends CordovaPlugin
+{
+    private BTChipTransportAndroid device;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -25,14 +24,11 @@ public class ledger extends CordovaPlugin {
         //Temporary for debugging
         switch(action)
         {
-            case "initTransport":
-                this.initTransport(args, callbackContext);
+            case "init":
+                this.init(args, callbackContext);
                 return true;
-            case "initDongle":
-                this.initDongle(args, callbackContext);
-                return true;
-            case "setup":
-                this.setup(args, callbackContext);
+            case "setupWallet":
+                this.setupWallet(args, callbackContext);
                 return true;
             case "getPinRemainingAttempts":
                 this.getPinRemainingAttempts(args, callbackContext);
@@ -48,45 +44,28 @@ public class ledger extends CordovaPlugin {
         return false;
     }
 
-    //Sets up the TEE transport allowing connection to the device
-    //TODO: Link initialization steps because state needs to be maintained within Java (i think)
-    private void initTransport(JSONArray args, CallbackContext callbackContext)
+    //Finds the USB devices and attempts to connect to it, return back if found or not
+    private void init(JSONArray args, CallbackContext callbackContext)
     {
+        //Create an interface to the device
+        device = new BTChipTransportAndroid(cordova.getContext());
 
-        //Success can take a JSONObject, JSONArray, or String
-        //Obviously can't send back a Transport object b/c it's going to JS
-        callbackContext.success("Transport initialized");
-        callbackContext.error("Cannot initialize transport");
-    }
-
-    //Uses the TEE transport to create a BTDongle object
-    //TODO: Link initialization steps because state needs to be maintained within Java (i think)
-    private void initDongle(JSONArray args, CallbackContext callbackContext)
-    {
-        BTChipDongle dongle = new BTChipDongle(new BTChipTransport()
+        //Parse the callback from connect method into the CallbackContext cordova wants
+        boolean connectionResult = device.connect(cordova.getContext(), success ->
         {
-            @Override
-            public byte[] exchange(byte[] command) throws BTChipException
+            if(success)
             {
-                return new byte[0];
+                callbackContext.success("Connection established");
             }
-
-            @Override
-            public void close() throws BTChipException
+            else
             {
-
-            }
-
-            @Override
-            public void setDebug(boolean debugFlag)
-            {
-
+                callbackContext.error("Connection failed or timed out");
             }
         });
     }
 
     //Allows the creation of a new wallet
-    private void setup(JSONArray args, CallbackContext callbackContext)
+    private void setupWallet(JSONArray args, CallbackContext callbackContext)
     {
     }
 

@@ -1,9 +1,29 @@
-package ledger.wallet.service;
+/*
+*******************************************************************************    
+*   Ledger Bitcoin Hardware Wallet Java API
+*   (c) 2014-2015 Ledger - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
+*   
+*  Licensed under the Apache License, Version 2.0 (the "License");
+*  you may not use this file except in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  See the License for the specific language governing permissions and
+*   limitations under the License.
+********************************************************************************
+*/
+
+package com.ledger.wallet.service;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ServiceResult implements Parcelable {
+public class ServiceResult implements Parcelable
+{
 	
 	private byte[] result;
 	private byte[] extendedResult;
@@ -97,7 +117,7 @@ public class ServiceResult implements Parcelable {
 		writeStringToParcel(exceptionMessage, dest);
 	}
 	
-	public static final Creator<ServiceResult> CREATOR = new Creator<ServiceResult>() {
+	public static final Parcelable.Creator<ServiceResult> CREATOR = new Creator<ServiceResult>() {
 
 		@Override
 		public ServiceResult createFromParcel(Parcel source) {

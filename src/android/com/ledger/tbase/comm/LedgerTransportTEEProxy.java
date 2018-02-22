@@ -1,4 +1,23 @@
-package ledger.tbase.comm;
+/*
+*******************************************************************************    
+*   Ledger Bitcoin Hardware Wallet Java API
+*   (c) 2014-2015 Ledger - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
+*   
+*  Licensed under the Apache License, Version 2.0 (the "License");
+*  you may not use this file except in compliance with the License.
+*  You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+*   Unless required by applicable law or agreed to in writing, software
+*   distributed under the License is distributed on an "AS IS" BASIS,
+*   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+*  See the License for the specific language governing permissions and
+*   limitations under the License.
+********************************************************************************
+*/
+
+package com.ledger.tbase.comm;
 
 import android.content.Context;
 import android.util.Log;
@@ -12,7 +31,6 @@ import com.ledger.wallet.service.ILedgerWalletService;
 import com.ledger.wallet.service.ServiceResult;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.concurrent.Future;
 
@@ -26,9 +44,13 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 	private byte[] session;
 	private byte[] nvm;
 	private boolean debug;
+	private boolean teeImplementation;
+	
+	private static final byte FEATURES_TEE = (byte)0x01;
+	private static final byte FEATURES_JAVACARD_PROXY = (byte)0x02;	
 	
 	private static final byte PROTOCOL_CARD = (byte)0x01;
-	
+		
 	private static final byte[] APDU_INIT[] = {
 		Dump.hexToBin("D020000038000000000000000118F43F95A217EFEDE0A8D98DAC357E3B2501E79C3958B9D7E15238D43A6807C397680EB805BC0E95E2B65D9E49B1B045"),
 		Dump.hexToBin("D02200002B000000020000000120B25006C589F0DCF1BBB75BAA1542A5E6CF300995F0046DE59CC641C0798D9D489006")
@@ -40,7 +62,6 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 	public LedgerTransportTEEProxy(Context context, ILedgerWalletService service) {
 		this.context = context;
 		this.service = service;
-		nvm = new byte[0];
 	}
 	
 	public LedgerTransportTEEProxy(Context context) {
@@ -62,13 +83,26 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 		return service;
 	}
 	
+	public boolean hasTeeImplementation() {
+		return teeImplementation;
+	}
+	
 	public boolean init() {
-		ServiceResult result;
+		ServiceResult result = null;
 		
 		if (service == null) {
 			Log.d(TAG, "Cannot initialize until service is available");
 			return false;
 		}
+		
+		try {
+			result = service.getServiceFeatures();
+		}
+		catch(Exception e) {
+			Log.d(TAG, "Failed to query service features (internal)", e);
+			return false;
+		}
+		teeImplementation = ((result.getResult()[0] & FEATURES_TEE) != (byte)0);
 		
 		try {
 			result = service.openDefault();
@@ -90,7 +124,7 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 			try {
 				close();
 			}
-			catch(Exception e1) {				
+			catch(Exception e1) {
 			}
 			return false;
 		}
@@ -99,36 +133,41 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 			try {
 				close();
 			}
-			catch(Exception e1) {				
+			catch(Exception e1) {
 			}
 			return false;
 		}
-		try {
-			for (byte[] apdu : APDU_INIT) {
-				int sw;
-				byte[] response = exchange(apdu).get();
-				if ((response != null) && (response.length > 2)) {
-					sw = ((response[response.length - 2] & 0xff) << 8) | (response[response.length - 1] & 0xff);
-					if ((sw != SW_OK) && (sw != SW_CONDITIONS_NOT_SATISFIED)) {
-						throw new BTChipException("Invalid response status " + Integer.toHexString(sw));
+		if (teeImplementation) {
+			try {
+				for (byte[] apdu : APDU_INIT) {
+					int sw = 0;
+					byte[] response = exchange(apdu).get();
+					if ((response != null) && (response.length > 2)) {
+						sw = ((response[response.length - 2] & 0xff) << 8) | (response[response.length - 1] & 0xff);
+						if ((sw != SW_OK) && (sw != SW_CONDITIONS_NOT_SATISFIED)) {
+							throw new BTChipException("Invalid response status " + Integer.toHexString(sw));
+						}
 					}
 				}
 			}
-		}
-		catch(Exception e) {
-			try {
-				close();
+			catch(Exception e) {
+				try {
+					close();
+				}
+				catch(Exception e1) {
+				}
+				Log.d(TAG, "Init failed", e);
+				return false;
 			}
-			catch(Exception e1) {				
-			}
-			Log.d(TAG, "Init failed", e);
-			return false;
 		}
 						
 		return true;
 	}
 	
 	private boolean needExternalUI(byte[] commandParam) {
+		if (!teeImplementation) {
+			return false;
+		}
 		// Some commands need to call the Trusted UI :
 		// SETUP, VERIFY PIN, HASH INPUT FINALIZE, HASH INPUT FINALIZE FULL
 		byte ins = commandParam[1];
@@ -146,7 +185,7 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 	@Override
 	public Future<byte[]> exchange(byte[] command) throws BTChipException
     {
-		ServiceResult result;
+		ServiceResult result = null;
 				
 		if (debug) {
 			Log.d(BTChipTransportAndroid.LOG_STRING, "=> " + Dump.dump(command));
@@ -208,7 +247,7 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 		if (session == null) {
 			throw new BTChipException("Session is not open");
 		}	
-		ServiceResult result;
+		ServiceResult result = null;
 		try {
 			result = service.getStorage(session);
 		}
@@ -226,12 +265,7 @@ public class LedgerTransportTEEProxy implements BTChipTransport
 			return nvm;
 		}
 		catch(Exception e) {
-			if (e instanceof FileNotFoundException) {
-				Log.d(TAG, "Unable to load NVM");
-			}
-			else {
-				Log.d(TAG, "Unable to load NVM", e);
-			}
+			Log.d(TAG, "Unable to load NVM: " + e.getMessage());
 			return null;
 		}
 	}

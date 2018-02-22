@@ -17,18 +17,24 @@
 ********************************************************************************
 */
 
-package com.btchip.comm;
+package com.ledger.wallet.service;
 
-import com.btchip.BTChipException;
+import com.ledger.wallet.service.ServiceResult;
 
-import java.util.concurrent.Future;
+interface ILedgerWalletService {
 
-public interface BTChipTransport {
+	ServiceResult getServiceVersion();
+	ServiceResult getServiceFeatures();
 
-   public Future<byte[]> exchange(byte[] command) throws BTChipException;
+	ServiceResult getPersonalization();
 
-   public void close() throws BTChipException;
-
-   public void setDebug(boolean debugFlag);
+	ServiceResult openDefault();
+	ServiceResult open(int spid, in byte[] pTAData, int TAsize);
+	ServiceResult initStorage(in byte[] sessionBlob, in byte[] storage);
+	ServiceResult exchange(in byte[] sessionBlob, in byte[] request);
+	ServiceResult exchangeExtended(in byte[] sessionBlob, byte protocol, in byte[] request, in byte[] extendedRequest);
+	ServiceResult exchangeExtendedUI(in byte[] sessionBlob, in byte[] request); 
+	ServiceResult getStorage(in byte[] sessionBlob);
+	ServiceResult close(in byte[] sessionBlob);
 
 }

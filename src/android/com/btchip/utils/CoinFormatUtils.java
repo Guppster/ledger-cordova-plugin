@@ -1,7 +1,7 @@
 /*
 *******************************************************************************    
-*   BTChip Bitcoin Hardware Wallet Java API
-*   (c) 2014 BTChip - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
+*   Ledger Bitcoin Hardware Wallet Java API
+*   (c) 2014-2015 Ledger - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
 *   
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ package com.btchip.utils;
 import java.math.BigDecimal;
 
 public class CoinFormatUtils {
-	
-	public static long toSatoshi(String amount) {
-		return new BigDecimal(amount).movePointRight(8).toBigIntegerExact().longValue();
-	}
+
+   public static long toSatoshi(String amount) {
+      return new BigDecimal(amount).movePointRight(8).toBigIntegerExact().longValue();
+   }
 
 }

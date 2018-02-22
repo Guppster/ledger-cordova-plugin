@@ -1,7 +1,7 @@
 /*
 *******************************************************************************    
-*   BTChip Bitcoin Hardware Wallet Java API
-*   (c) 2014 BTChip - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
+*   Ledger Bitcoin Hardware Wallet Java API
+*   (c) 2014-2015 Ledger - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
 *   
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -19,16 +19,19 @@
 
 package com.btchip.comm.android;
 
-import android.util.Log;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
-
+import android.util.Log;
 import com.btchip.BTChipException;
 import com.btchip.comm.BTChipTransport;
 import com.btchip.utils.Dump;
+import com.btchip.utils.FutureUtils;
 
-public class BTChipTransportAndroidWinUSB implements BTChipTransport {
+import java.util.concurrent.Future;
+
+public class BTChipTransportAndroidWinUSB implements BTChipTransport
+{
 
 	private UsbDeviceConnection connection;
 	private UsbInterface dongleInterface;
@@ -48,7 +51,8 @@ public class BTChipTransportAndroidWinUSB implements BTChipTransport {
 	}
 
 	@Override
-	public byte[] exchange(byte[] command) throws BTChipException {
+	public Future<byte[]> exchange(byte[] command) throws BTChipException
+    {
 		if (debug) {
 			Log.d(BTChipTransportAndroid.LOG_STRING, "=> " + Dump.dump(command));
 		}
@@ -69,15 +73,16 @@ public class BTChipTransportAndroidWinUSB implements BTChipTransport {
 			byte[] response = new byte[2];
 			response[0] = (byte)sw1;
 			response[1] = (byte)sw2;
-			return response;
+			return FutureUtils.getDummyFuture(response);
 		}
 		byte[] response = new byte[sw2 + 2];
 		System.arraycopy(transferBuffer, 2, response, 0, sw2 + 2);
-		return response;
+		return FutureUtils.getDummyFuture(response);
 	}
 
 	@Override
-	public void close() throws BTChipException {
+	public void close() throws BTChipException
+    {
 		connection.releaseInterface(dongleInterface);
 		connection.close();
 	}

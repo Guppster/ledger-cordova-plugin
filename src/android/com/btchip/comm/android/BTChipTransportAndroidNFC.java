@@ -1,7 +1,7 @@
 /*
 *******************************************************************************    
-*   BTChip Bitcoin Hardware Wallet Java API
-*   (c) 2014 BTChip - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
+*   Ledger Bitcoin Hardware Wallet Java API
+*   (c) 2014-2015 Ledger - 1BTChip7VfTnrPra5jqci7ejnMguuHogTn
 *   
 *  Licensed under the Apache License, Version 2.0 (the "License");
 *  you may not use this file except in compliance with the License.
@@ -19,33 +19,37 @@
 
 package com.btchip.comm.android;
 
-import android.nfc.tech.IsoDep;
 import android.util.Log;
-
 import com.btchip.BTChipException;
 import com.btchip.comm.BTChipTransport;
 import com.btchip.utils.Dump;
+import com.btchip.utils.FutureUtils;
+import nordpol.android.AndroidCard;
 
-public class BTChipTransportAndroidNFC implements BTChipTransport {
+import java.util.concurrent.Future;
+
+public class BTChipTransportAndroidNFC implements BTChipTransport
+{
 	
-	public static final int DEFAULT_TIMEOUT = 5000;
+	public static final int DEFAULT_TIMEOUT = 30000;
 	
-	private IsoDep card;
+	private AndroidCard card;
 	private int timeout;
 	private boolean debug;	
 	
-	public BTChipTransportAndroidNFC(IsoDep card, int timeout) {
+	public BTChipTransportAndroidNFC(AndroidCard card, int timeout) {
 		this.card = card;
 		this.timeout = timeout;
+		card.setTimeout(timeout);
 	}
 	
-	public BTChipTransportAndroidNFC(IsoDep card) {
+	public BTChipTransportAndroidNFC(AndroidCard card) {
 		this(card, DEFAULT_TIMEOUT);
 	}
 	
-
 	@Override
-	public byte[] exchange(byte[] command) throws BTChipException {
+	public Future<byte[]> exchange(byte[] command) throws BTChipException
+    {
 		try {
 			if (!card.isConnected()) {
 				card.connect();
@@ -63,13 +67,13 @@ public class BTChipTransportAndroidNFC implements BTChipTransport {
 			if (debug) {
 				Log.d(BTChipTransportAndroid.LOG_STRING, "<= " + Dump.dump(response));
 			}
-			return response;			
+			return FutureUtils.getDummyFuture(response);
 		}
 		catch(Exception e) {
 			try {
 				card.close();
 			}
-			catch(Exception e1) {				
+			catch(Exception e1) {
 			}
 			throw new BTChipException("I/O error", e);
 		}
@@ -77,13 +81,14 @@ public class BTChipTransportAndroidNFC implements BTChipTransport {
 	}
 
 	@Override
-	public void close() throws BTChipException {
+	public void close() throws BTChipException
+    {
 		try {
 			if (card.isConnected()) {
 				card.close();
 			}			
 		}
-		catch(Exception e) {			
+		catch(Exception e) {
 		}
 	}
 
