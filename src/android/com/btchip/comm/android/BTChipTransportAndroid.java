@@ -30,7 +30,6 @@ import android.util.Log;
 import com.btchip.comm.BTChipTransport;
 import com.btchip.comm.BTChipTransportFactory;
 import com.btchip.comm.BTChipTransportFactoryCallback;
-import nordpol.android.AndroidCard;
 
 import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -112,34 +111,9 @@ public class BTChipTransportAndroid implements BTChipTransportFactory
          } catch (Exception e) {
          }
       }
-      if (detectedTag != null) {
-         try {
-            Log.d(LOG_TAG, "Connect to NFC tag");
-            AndroidCard card = AndroidCard.get(detectedTag);
-            card.connect();
-            if (aid != null) {
-               byte[] apdu = new byte[aid.length + 5];
-               apdu[0] = (byte) 0x00;
-               apdu[1] = (byte) 0xA4;
-               apdu[2] = (byte) 0x04;
-               apdu[3] = (byte) 0x00;
-               apdu[4] = (byte) aid.length;
-               System.arraycopy(aid, 0, apdu, 5, aid.length);
-               byte[] response = card.transceive(apdu);
-               if ((response[response.length - 2] != (byte) 0x90) || (response[response.length - 1] != (byte) 0x00)) {
-                  throw new RuntimeException("Select failed");
-               }
-            }
-            transport = new BTChipTransportAndroidNFC(card);
-            callback.onConnected(true);
-            return true;
-         } catch (Exception e) {
-            Log.d(LOG_TAG, "NFC tag select failed", e);
-            detectedTag = null;
-            callback.onConnected(false);
-            return false;
-         }
-      }
+      //TODO: Add NFC Support
+      //if (detectedTag != null) {
+      //}
       IntentFilter filter = new IntentFilter();
       filter.addAction(ACTION_USB_PERMISSION);
       context.registerReceiver(mUsbReceiver, filter);

@@ -5,6 +5,8 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
+import android.content.Context;
+import android.widget.Toast;
 
 /**
  * This class handles the native Android operations of interacting with a Ledger device
@@ -13,6 +15,7 @@ import org.json.JSONException;
 public class ledger extends CordovaPlugin
 {
     private BTChipTransportAndroid device;
+    private Context context;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -22,43 +25,42 @@ public class ledger extends CordovaPlugin
         //method.invoke(args, callbackContext)
 
         //Temporary for debugging
-        switch(action)
+        context = this.cordova.getActivity().getApplicationContext();
+        Toast toastContext = Toast.makeText(context, "Context found", Toast.LENGTH_LONG);
+
+        toastContext.show();
+
+        if(action.equals("init"))
         {
-            case "init":
-                this.init(args, callbackContext);
-                return true;
-            case "setupWallet":
-                this.setupWallet(args, callbackContext);
-                return true;
-            case "getPinRemainingAttempts":
-                this.getPinRemainingAttempts(args, callbackContext);
-                return true;
-            case "verifyPin":
-                this.verifyPin(args, callbackContext);
-                return true;
-            case "getWalletPublicKey":
-                this.getWalletPublicKey(args, callbackContext);
-                return true;
+            init(callbackContext);
         }
 
-        return false;
+        return true;
     }
 
     //Finds the USB devices and attempts to connect to it, return back if found or not
-    private void init(JSONArray args, CallbackContext callbackContext)
+    private void init(CallbackContext callbackContext)
     {
+        Toast toastFound = Toast.makeText(context, "device found", Toast.LENGTH_LONG);
+        Toast toastSuccess = Toast.makeText(context, "success", Toast.LENGTH_LONG);
+        Toast toastError = Toast.makeText(context, "error", Toast.LENGTH_LONG);
+
         //Create an interface to the device
-        device = new BTChipTransportAndroid(cordova.getContext());
+        device = new BTChipTransportAndroid(context);
+
+        toastFound.show();
 
         //Parse the callback from connect method into the CallbackContext cordova wants
-        boolean connectionResult = device.connect(cordova.getContext(), success ->
+        boolean connectionResult = device.connect(context, success ->
         {
             if(success)
             {
+                toastSuccess.show();
                 callbackContext.success("Connection established");
             }
             else
             {
+                toastError.show();
                 callbackContext.error("Connection failed or timed out");
             }
         });

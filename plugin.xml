@@ -10,12 +10,22 @@
             <feature name="ledger">
                 <param name="android-package" value="gurpreetsingh.ledger" />
             </feature>
+
+            <feature name="ILedgerWalletService">
+                <param name="android-package" value="aidl" />
+            </feature>
+
+            <feature name="ServiceResult">
+                <param name="android-package" value="aidl" />
+            </feature>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/*" />
 
-        <source-file src="src/android/ledger.java" target-dir="src/android/gurpreetsingh/ledger" />
-        <source-file src="src/android/com" target-dir="src/android/gurpreetsingh/ledger"/>
+        <source-file src="build-extras.gradle" target-dir="." />
+
+        <source-file src="src/android/ledger.java" target-dir="src/main/" />
+        <source-file src="src/android/com" target-dir="src/main/"/>
 
     </platform>
 </plugin>
