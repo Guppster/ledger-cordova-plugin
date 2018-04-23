@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="gurpreetsingh.ledger" version="0.0.1">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="me.gurpreetsingh" version="0.0.1">
     <name>ledger</name>
     <AUTHOR>Gurpreet</AUTHOR>
-    <js-module name="ledger" src="www/ledger.js">
-        <clobbers target="cordova.plugins.ledger" />
-    </js-module>
     <platform name="android">
+        <js-module name="ledger" src="www/ledger.js">
+            <clobbers target="cordova.plugins.ledger" />
+        </js-module>
+
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="ledger">
-                <param name="android-package" value="gurpreetsingh.ledger" />
+                <param name="android-package" value="me.gurpreetsingh.cordova.ledger" />
+                <param name="onload" value="true" />
             </feature>
 
             <feature name="ILedgerWalletService">
@@ -24,8 +26,8 @@
 
         <source-file src="build-extras.gradle" target-dir="." />
 
-        <source-file src="src/android/ledger.java" target-dir="src/main/" />
-        <source-file src="src/android/com" target-dir="src/main/"/>
+        <source-file src="src/android/ledger.java" target-dir="src/me/gurpreetsingh/cordova" />
+        <source-file src="src/android/com" target-dir="src/android/"/>
 
     </platform>
 </plugin>

@@ -1,8 +1,9 @@
-package me.gurpreetsingh.ledger;
+package me.gurpreetsingh.cordova;
 
 import com.btchip.comm.android.BTChipTransportAndroid;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import android.content.Context;
@@ -26,9 +27,6 @@ public class ledger extends CordovaPlugin
 
         //Temporary for debugging
         context = this.cordova.getActivity().getApplicationContext();
-        Toast toastContext = Toast.makeText(context, "Context found", Toast.LENGTH_LONG);
-
-        toastContext.show();
 
         if(action.equals("init"))
         {
@@ -48,7 +46,10 @@ public class ledger extends CordovaPlugin
         //Create an interface to the device
         device = new BTChipTransportAndroid(context);
 
-        toastFound.show();
+        if(device.isPluggedIn())
+        {
+            toastFound.show();
+        }
 
         //Parse the callback from connect method into the CallbackContext cordova wants
         boolean connectionResult = device.connect(context, success ->
