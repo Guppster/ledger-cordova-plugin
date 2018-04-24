@@ -1,11 +1,11 @@
 package me.gurpreetsingh.cordova;
 
+import com.btchip.BTChipDongle.BTChipPublicKey;
 import com.btchip.BTChipException;
 import com.btchip.comm.BTChipTransport;
 import com.btchip.comm.android.BTChipTransportAndroid;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import android.content.Context;
@@ -19,6 +19,8 @@ import com.btchip.BTChipDongle;
 public class ledger extends CordovaPlugin
 {
     private static final String DUMMY_PIN = "0000";
+    private static final int SW_INVALID_PIN = 0x63C0;
+    private static final int SW_CONDITIONS_NOT_SATISFIED = 0x6985;
 
     private BTChipTransportAndroid device;
     private Context context;
@@ -82,7 +84,7 @@ public class ledger extends CordovaPlugin
     {
         try
         {
-            dongle.setup(new BTChipDongle.OperationMode[]{BTChipDongle.OperationMode.WALLET},
+            boolean setupResult = dongle.setup(new BTChipDongle.OperationMode[]{BTChipDongle.OperationMode.WALLET},
                     new BTChipDongle.Feature[]{BTChipDongle.Feature.RFC6979},
                     03,         //Standard address header goes here
                     05,    //multisig address header goes here
@@ -90,12 +92,20 @@ public class ledger extends CordovaPlugin
                     null,
                     null,
                     null,
-                    null
-                    );
+                    null);
+
+            if(setupResult)
+            {
+                callbackContext.success("Wallet successfully setup");
+            }
+            else
+            {
+                callbackContext.error("Error setting up wallet");
+            }
         }
         catch (BTChipException e)
         {
-            e.printStackTrace();
+            callbackContext.error("Error setting up wallet" + e.toString());
         }
     }
 
@@ -104,11 +114,18 @@ public class ledger extends CordovaPlugin
     {
         try
         {
-            dongle.getWalletPublicKey("some key path");
+            //TODO: Figure out how parameters work in cordova and get a real key string
+            BTChipPublicKey publicKey = dongle.getWalletPublicKey("some key path");
+
+            callbackContext.success(publicKey.toString());
         }
         catch (BTChipException e)
         {
-            e.printStackTrace();
+            if (e.getSW() == SW_CONDITIONS_NOT_SATISFIED)
+            {
+                callbackContext.error("Wallet not setup");
+                //We can set one up on the fly (setupWallet()) if needed
+            }
         }
     }
 
@@ -118,10 +135,14 @@ public class ledger extends CordovaPlugin
         try
         {
             dongle.verifyPin(DUMMY_PIN.getBytes());
+            callbackContext.success("PIN Valid");
         }
         catch (BTChipException e)
         {
-            e.printStackTrace();
+            if ((e.getSW() & 0xfff0) == SW_INVALID_PIN)
+            {
+                callbackContext.error("Invalid PIN - " + (e.getSW() - SW_INVALID_PIN) + " attempts remaining");
+            }
         }
 
     }
@@ -131,7 +152,7 @@ public class ledger extends CordovaPlugin
     {
         try
         {
-            dongle.getVerifyPinRemainingAttempts();
+            callbackContext.success(dongle.getVerifyPinRemainingAttempts());
         }
         catch (BTChipException e)
         {
