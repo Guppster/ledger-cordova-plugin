@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="me.gurpreetsingh" version="0.0.1">
+    <engines>
+        <engine name="cordova-android" version=">=1.8.0" />
+    </engines>
+
     <name>ledger</name>
     <AUTHOR>Gurpreet</AUTHOR>
+
     <platform name="android">
         <js-module name="ledger" src="www/ledger.js">
             <clobbers target="cordova.plugins.ledger" />
@@ -13,21 +18,35 @@
                 <param name="onload" value="true" />
             </feature>
 
-            <feature name="ILedgerWalletService">
-                <param name="android-package" value="aidl" />
-            </feature>
-
-            <feature name="ServiceResult">
-                <param name="android-package" value="aidl" />
-            </feature>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/*" />
 
-        <source-file src="build-extras.gradle" target-dir="." />
-
         <source-file src="src/android/ledger.java" target-dir="src/me/gurpreetsingh/cordova" />
-        <source-file src="src/android/com" target-dir="src/android/"/>
+
+        <source-file src="src/android/com/btchip/comm/android/BTChipTransportAndroid.java" target-dir="src/com/btchip/comm/android"/>
+        <source-file src="src/android/com/btchip/comm/android/BTChipTransportAndroidHID.java" target-dir="src/com/btchip/comm/android"/>
+        <source-file src="src/android/com/btchip/comm/android/BTChipTransportAndroidWinUSB.java" target-dir="src/com/btchip/comm/android"/>
+
+        <source-file src="src/android/com/btchip/comm/BTChipTransport.java" target-dir="src/com/btchip/comm"/>
+        <source-file src="src/android/com/btchip/comm/BTChipTransportFactory.java" target-dir="src/com/btchip/comm"/>
+        <source-file src="src/android/com/btchip/comm/BTChipTransportFactoryCallback.java" target-dir="src/com/btchip/comm"/>
+        <source-file src="src/android/com/btchip/comm/LedgerHelper.java" target-dir="src/com/btchip/comm"/>
+
+        <source-file src="src/android/com/btchip/utils/BIP32Utils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/BufferUtils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/CoinFormatUtils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/Dump.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/FutureUtils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/KeyUtils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/SignatureUtils.java" target-dir="src/com/btchip/utils"/>
+        <source-file src="src/android/com/btchip/utils/VarintUtils.java" target-dir="src/com/btchip/utils"/>
+
+        <source-file src="src/android/com/btchip/BitcoinTransaction.java" target-dir="src/com/btchip"/>
+        <source-file src="src/android/com/btchip/BTChipConstants.java" target-dir="src/com/btchip"/>
+        <source-file src="src/android/com/btchip/BTChipDongle.java" target-dir="src/com/btchip"/>
+        <source-file src="src/android/com/btchip/BTChipException.java" target-dir="src/com/btchip"/>
+        <source-file src="src/android/com/btchip/BTChipKeyRecovery.java" target-dir="src/com/btchip"/>
 
     </platform>
 </plugin>

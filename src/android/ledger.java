@@ -10,7 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import android.content.Context;
 import android.widget.Toast;
-import com.btchip.BTChipDongle;
+import com.btchip.*;
 
 /**
  * This class handles the native Android operations of interacting with a Ledger device
