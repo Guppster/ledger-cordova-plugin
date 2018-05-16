@@ -12,3 +12,20 @@ or cloning and linking a local copy
 git clone git@github.com:Guppster/ledger-cordova-plugin.git
 cordova plugin add --link path/to/cloned/repository
 ```
+
+## Functionality
+
+### init()
+Determines of the ledger device is pluged in and sets up the plugin to initiate further communication. 
+Returns back success if device found, error if not found.
+
+### setupWallet()
+
+### getWalletPublicAddress()
+
+### verifyPin()
+
+### getPinRemainingAttempts()
+
+
+

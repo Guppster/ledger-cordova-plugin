@@ -43,6 +43,22 @@ public class ledger extends CordovaPlugin
         {
             init(callbackContext);
         }
+        else if(action.equals("setupWallet"))
+        {
+            setupWallet(callbackContext);
+        }
+        else if(action.equals("getWalletPublicKey"))
+        {
+            getWalletPublicKey(callbackContext);
+        }
+        else if(action.equals("verifyPin"))
+        {
+            verifyPin(callbackContext);
+        }
+        else if(action.equals("getPinRemainingAttempts"))
+        {
+            getPinRemainingAttempts(callbackContext);
+        }
 
         return true;
     }
