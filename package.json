@@ -21,5 +21,17 @@
   "bugs": {
     "url": "https://github.com/Guppster/ledger-cordova-plugin/issues"
   },
-  "homepage": "https://github.com/Guppster/ledger-cordova-plugin#readme"
+  "homepage": "https://github.com/Guppster/ledger-cordova-plugin#readme",
+  "cordova": {
+    "id": "me.gurpreetsingh",
+    "platforms": [
+      "android"
+    ]
+  },
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.0.0"
+    }
+  ]
 }
