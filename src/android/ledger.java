@@ -37,7 +37,10 @@ public class ledger extends CordovaPlugin
         //method.invoke(args, callbackContext)
 
         //Temporary for debugging
-        context = this.cordova.getActivity().getApplicationContext();
+        context = this.cordova.getActivity();
+
+        Toast bad = Toast.makeText(context, "i hate js", Toast.LENGTH_LONG);
+        bad.show();
 
         if(action.equals("init"))
         {
@@ -67,6 +70,9 @@ public class ledger extends CordovaPlugin
     private void init(CallbackContext callbackContext)
     {
         Toast toastFound = Toast.makeText(context, "device found", Toast.LENGTH_LONG);
+        Toast toastNotFound = Toast.makeText(context, "device NOT found", Toast.LENGTH_LONG);
+
+        toastNotFound.show();
 
         //Create an interface to the device
         device = new BTChipTransportAndroid(context);
@@ -74,6 +80,10 @@ public class ledger extends CordovaPlugin
         if(device.isPluggedIn())
         {
             toastFound.show();
+        }
+        else
+        {
+            toastNotFound.show();
         }
 
         //Parse the callback from connect method into the CallbackContext cordova wants
@@ -96,7 +106,7 @@ public class ledger extends CordovaPlugin
     }
 
     //Allows the creation of a new wallet
-    private void setupWallet(JSONArray args, CallbackContext callbackContext)
+    private void setupWallet(CallbackContext callbackContext)
     {
         try
         {
@@ -126,7 +136,7 @@ public class ledger extends CordovaPlugin
     }
 
     //Returns the public key associated with the dongle
-    private void getWalletPublicKey(JSONArray args, CallbackContext callbackContext)
+    private void getWalletPublicKey(CallbackContext callbackContext)
     {
         try
         {
@@ -146,7 +156,7 @@ public class ledger extends CordovaPlugin
     }
 
     //Prompts for pin verification
-    private void verifyPin(JSONArray args, CallbackContext callbackContext)
+    private void verifyPin(CallbackContext callbackContext)
     {
         try
         {
@@ -164,7 +174,7 @@ public class ledger extends CordovaPlugin
     }
 
     //Returns how many pin attempts are remaining
-    private void getPinRemainingAttempts(JSONArray args, CallbackContext callbackContext)
+    private void getPinRemainingAttempts(CallbackContext callbackContext)
     {
         try
         {
